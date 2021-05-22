@@ -25,6 +25,7 @@ The script uses `PlayerSettings.GetScriptingDefineSymbolsForGroup()` and then sp
 ### Checking for a required file is your responsibility.
 
 ![Cheech Marin Responsibility gif](Media/Cheech-Marin-Responsibility.gif)
+
 That said, we added some class to check for specific files: `EditorFileUtility.FileExistsInAbsolutePath()` checks for a path. the start path is the project root folder (outside of the Assets). You can also check for a valid folder in your assets by calling `EditorFileUtility.ValidFolder()`
 
 You can use the code mentioned above as a condition to add or remove a definition. I would recommend creating a script in the Editor folder called **[YOUR-PLUGIN-NAME]DefineSymbol.cs** and add the following:
