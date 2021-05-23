@@ -1,3 +1,4 @@
+
 # Custom Define Symbols Utility
 The script allows you to easily add custom **#Define Symbols**. Which helps avoid compiling code that is missing a dependency.
 
@@ -6,6 +7,7 @@ The script allows you to easily add custom **#Define Symbols**. Which helps avoi
  - #### [WHAT IS IT?](#Define-Symbols-Utility)
  - #### [WHY YOU USE IT?](#Why-use-it?)
  - #### [INSTALLING](#Installing-the-package)
+ - #### [METHODS](#Methods)
  - #### [HOW IT WORKS](#How-does-it-work?)
 ---
 
@@ -17,6 +19,14 @@ Have you ever wanted to create your own Define Symbol to avoid errors if a speci
 - Use the Unity Package Manager and past the GitHub URL []
 - Download the script/package from the Release Section
 
+# Methods
+
+- `ContainsDefineSymbol(string symbol)`  **-Check if the current define    symbols contain a definition** 
+- `AddDefineSymbol(string symbol)`     **-Add define symbol** 
+- `RemoveDefineSymbol(string[] symbols)`  **-Remove define symbol** 
+-  `FilePathExists(string path)`  **-Determines whether the specified file exists relative to the root project** 
+-  `FilePathExistsWildCard(string path, string searchPattern)`  **- wildcard search for files** 
+-  `DirectoryPathExistsWildCard(string path, string searchPattern)`  **-    wildcard search for folders**
 
 # How does it work?
 
@@ -26,7 +36,7 @@ The script uses `PlayerSettings.GetScriptingDefineSymbolsForGroup()` and then sp
 
 ![Cheech Marin Responsibility gif](Documentation~/Media/Cheech-Marin-Responsibility.gif)
 
-That said, we added some class to check for specific files: `EditorFileUtility.FileExistsInAbsolutePath()` checks for a path. the start path is the project root folder (outside of the Assets). You can also check for a valid folder in your assets by calling `EditorFileUtility.ValidFolder()`
+That said, we added some class to check for specific files: `EditorFileUtility.FilePathExists()` checks for a path. the start path is the project root folder (outside of the Assets). You can also check for a valid folder in your assets by calling `EditorFileUtility.ValidFolder()`
 
 You can use the code mentioned above as a condition to add or remove a definition. I would recommend creating a script in the Editor folder called **[YOUR-PLUGIN-NAME]DefineSymbol.cs** and add the following:
 
@@ -41,8 +51,8 @@ You can use the code mentioned above as a condition to add or remove a definitio
     {  
 	    static [your-plugin-here]DefineSymbol()
         { 
-	        if (AssetDatabaseUtility.HasAsset("YOUR ASSET") 
-               || EditorFileUtility.ValidFolder("YOUR FOLDER"))
+	        if (DefineSymbolsUtility.FilePathExistsWildCard("Assets/Plugins","*.dll") 
+               || DefineSymbolsUtility.ValidFolder("YOUR FOLDER"))
             {
                 DefineSymbolsUtility.AddDefineSymbol("[your-plugin-DefineSymbol]");
                 Debug.Log("Added your-plugin Define Symbol.");
@@ -54,3 +64,6 @@ You can use the code mentioned above as a condition to add or remove a definitio
   
 
 And that's it! You will now have your custom definition added if the condition is met.
+
+
+---
