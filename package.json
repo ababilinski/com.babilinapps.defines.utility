@@ -1,0 +1,27 @@
+{
+  "author": {
+    "name": "Adrian Babilinski",
+    "url": "https://docs.unity3d.com/Manual/cus-legal.html"
+  },
+  "samples": [
+    {
+      "displayName": "Sample",
+      "description": "A set of sample scripts to demonstrate the package.",
+      "path": "Samples~"
+    }],
+  "dependencies": {
+    "com.unity.editorcoroutines": "1.0.0",
+    "com.unity.modules.unitywebrequest": "1.0.0"
+  },
+  "description": "The script allows you to easily add custom #Define Symbols. Which helps avoid compiling code that is missing a dependency.",
+  "displayName": "Custom Define Symbols Utility",
+  "keywords": [
+    "Symbols",
+    "Defines"
+  ],
+  "license": "MIT",
+  "name": "com.babilinapps.defines.utility",
+  "unity": "2019.1",
+  "unityRelease": "0b5",
+  "version": "0.0.1"
+}

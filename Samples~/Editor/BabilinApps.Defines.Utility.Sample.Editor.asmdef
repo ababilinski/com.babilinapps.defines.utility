@@ -1,0 +1,6 @@
+{
+	"name": "BabilinApps.Defines.Utility.Sample.Editor",
+	 "references": [
+        "BabilinApps.Defines.Utility.Editor"
+    ]
+}

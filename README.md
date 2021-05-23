@@ -1,4 +1,4 @@
-# Define Symbols Utility
+# Custom Define Symbols Utility
 The script allows you to easily add custom **#Define Symbols**. Which helps avoid compiling code that is missing a dependency.
 
 # Table of Contents (up to date)
@@ -24,7 +24,7 @@ The script uses `PlayerSettings.GetScriptingDefineSymbolsForGroup()` and then sp
 
 ### Checking for a required file is your responsibility.
 
-![Cheech Marin Responsibility gif](Media/Cheech-Marin-Responsibility.gif)
+![Cheech Marin Responsibility gif](Documentation~/Media/Cheech-Marin-Responsibility.gif)
 
 That said, we added some class to check for specific files: `EditorFileUtility.FileExistsInAbsolutePath()` checks for a path. the start path is the project root folder (outside of the Assets). You can also check for a valid folder in your assets by calling `EditorFileUtility.ValidFolder()`
 
