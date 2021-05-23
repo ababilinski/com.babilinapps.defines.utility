@@ -16,8 +16,8 @@ Have you ever wanted to create your own Define Symbol to avoid errors if a speci
 
 # Installing the package
 
-- Use the Unity Package Manager and past the GitHub URL []
-- Download the script/package from the Release Section
+- Use the Unity Package Manager and past the GitHub URL [https://github.com/ababilinski/com.babilinapps.defines.utility.git]
+- Download the script/package from the [Release Section](https://github.com/ababilinski/com.babilinapps.defines.utility/releases)
 
 # Methods
 
@@ -36,13 +36,13 @@ The script uses `PlayerSettings.GetScriptingDefineSymbolsForGroup()` and then sp
 
 ![Cheech Marin Responsibility gif](Documentation~/Media/Cheech-Marin-Responsibility.gif)
 
-That said, we added some class to check for specific files: `EditorFileUtility.FilePathExists()` checks for a path. the start path is the project root folder (outside of the Assets). You can also check for a valid folder in your assets by calling `EditorFileUtility.ValidFolder()`
+That said, we added some class to check for specific files: `DefineSymbolsUtility.FilePathExists()` checks for a path. the start path is the project root folder (outside of the Assets). You can also check for a valid folder in your assets by calling `DefineSymbolsUtility.ValidFolder()`
 
 You can use the code mentioned above as a condition to add or remove a definition. I would recommend creating a script in the Editor folder called **[YOUR-PLUGIN-NAME]DefineSymbol.cs** and add the following:
 
     #if ![YOUR-PLUGIN-DEFINE-SYMBOL]  
     using System.Collections; 
-    using Common.EditorUtilities; 
+    using BabilinApps.Defines.Utility.Editor;  
     using UnityEditor; 
     using UnityEngine;
     
