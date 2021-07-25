@@ -4,7 +4,7 @@ using UnityEditor;
 
 namespace BabilinApps.Defines.Utility.Sample.Editor
 {
-  public class CustomDefinesExampleWindow : EditorWindow
+  public class ExampleDefineSymbolWindow : EditorWindow
   {
 
     private const string CHECK_SYMBOL_MENU_PATH = "Example/Custom Defines/TextMeshPro/Check";
