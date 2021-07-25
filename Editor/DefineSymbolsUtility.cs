@@ -23,7 +23,9 @@
 */
 
 
-
+using System;
+using System.Dynamic;
+using System.Reflection;
 
 namespace BabilinApps.Defines.Utility.Editor
 {
@@ -38,15 +40,76 @@ namespace BabilinApps.Defines.Utility.Editor
 
   public class DefineSymbolsUtility
   {
+    private static BuildTargetGroup[] _cachedBuildTargets;
+    
+    private static BuildTargetGroup[] _buildTargets
+    {
+      get
+      {
+        if (_cachedBuildTargets == null)
+        {
+          
+          var t = (BuildTargetGroup[]) Enum.GetValues(typeof(BuildTargetGroup));
+          var buildTargetGroupType = typeof(BuildTargetGroup);
+          var fields = buildTargetGroupType.GetFields();
+          var obsoleteValueByBuildTargetGroup = new Dictionary<string, bool>();
+          for (int i = 0; i < fields.Length; i++)
+          {
+            obsoleteValueByBuildTargetGroup.Add(fields[i].Name,fields[i].GetCustomAttribute(typeof(ObsoleteAttribute)) != null);
+          }
+          _cachedBuildTargets = Array.FindAll(t,(e)=> !obsoleteValueByBuildTargetGroup[e.ToString()]);
+        }
+
+        return _cachedBuildTargets;
+      }
+    }
+
+
+    /// <summary>
+    /// Check if the all define symbols for a definition
+    /// </summary>
+    public static bool ContainsDefineSymbolInAnyBuildTargetGroup(string symbol)
+    {
+      
+      for (int i = 0; i < _buildTargets.Length; i++)
+      {
+        if (ContainsDefineSymbol(symbol, _buildTargets[i]))
+        {
+          return true;
+        }
+      }
+
+      return false;
+
+    }
     /// <summary>
     /// Check if the current define symbols contain a definition
     /// </summary>
     public static bool ContainsDefineSymbol(string symbol)
     {
-      string definesString =
-        PlayerSettings.GetScriptingDefineSymbolsForGroup(EditorUserBuildSettings.selectedBuildTargetGroup);
-      List<string> allDefines = definesString.Split(';').ToList();
-      return allDefines.Contains(symbol);
+       return  ContainsDefineSymbol(symbol, EditorUserBuildSettings.selectedBuildTargetGroup);
+      
+    }
+
+    /// <summary>
+    /// Check if the current define symbols contain a definition
+    /// </summary>
+    public static bool ContainsDefineSymbol(string symbol, BuildTargetGroup buildTarget)
+    {
+      string definesString =PlayerSettings.GetScriptingDefineSymbolsForGroup(buildTarget);
+      
+      return definesString.Contains(symbol);
+    }
+
+    /// <summary>
+    /// Add define symbols as soon as Unity gets done compiling.
+    /// </summary>
+    public static void AddDefineSymbolsToAllBuildTargetGroups(string[] symbols)
+    {
+      for (int i = 0; i < _buildTargets.Length; i++)
+      {
+        AddDefineSymbols(symbols, _buildTargets[i]);
+      }
     }
 
     /// <summary>
@@ -54,8 +117,15 @@ namespace BabilinApps.Defines.Utility.Editor
     /// </summary>
     public static void AddDefineSymbols(string[] symbols)
     {
-      string definesString =
-          PlayerSettings.GetScriptingDefineSymbolsForGroup(EditorUserBuildSettings.selectedBuildTargetGroup);
+      AddDefineSymbols(symbols, EditorUserBuildSettings.selectedBuildTargetGroup);
+    }
+
+    /// <summary>
+    /// Add define symbols as soon as Unity gets done compiling.
+    /// </summary>
+    public static void AddDefineSymbols(string[] symbols, BuildTargetGroup buildTarget)
+    {
+      string definesString = PlayerSettings.GetScriptingDefineSymbolsForGroup(buildTarget);
       List<string> allDefines = definesString.Split(';').ToList();
       allDefines.AddRange(symbols.Except(allDefines));
       PlayerSettings.SetScriptingDefineSymbolsForGroup(EditorUserBuildSettings.selectedBuildTargetGroup,
@@ -65,10 +135,29 @@ namespace BabilinApps.Defines.Utility.Editor
     /// <summary>
     /// Remove define symbols as soon as Unity gets done compiling.
     /// </summary>
+    public static void RemoveDefineSymbolsFromAllBuildTargetGroups(string[] symbols)
+    {
+      for (int i = 0; i < _buildTargets.Length; i++)
+      {
+        RemoveDefineSymbols(symbols, _buildTargets[i]);
+      }
+    }
+    /// <summary>
+    /// Remove define symbols as soon as Unity gets done compiling.
+    /// </summary>
     public static void RemoveDefineSymbols(string[] symbols)
     {
+      RemoveDefineSymbols(symbols, EditorUserBuildSettings.selectedBuildTargetGroup);
+     
+    }
+
+    /// <summary>
+    /// Remove define symbols as soon as Unity gets done compiling.
+    /// </summary>
+    public static void RemoveDefineSymbols(string[] symbols, BuildTargetGroup buildTarget)
+    {
       string definesString =
-          PlayerSettings.GetScriptingDefineSymbolsForGroup(EditorUserBuildSettings.selectedBuildTargetGroup);
+        PlayerSettings.GetScriptingDefineSymbolsForGroup(buildTarget);
       List<string> allDefines = definesString.Split(';').ToList();
 
       for (int i = 0; i < symbols.Length; i++)
@@ -84,6 +173,7 @@ namespace BabilinApps.Defines.Utility.Editor
         }
 
       }
+
       PlayerSettings.SetScriptingDefineSymbolsForGroup(EditorUserBuildSettings.selectedBuildTargetGroup,
                                                        string.Join(";", allDefines.ToArray()));
     }
@@ -91,10 +181,29 @@ namespace BabilinApps.Defines.Utility.Editor
     /// <summary>
     /// Add define symbol as soon as Unity gets done compiling.
     /// </summary>
+    public static void AddDefineSymbolToAllBuildTargetGroups(string symbol)
+    {
+      for (int i = 0; i < _buildTargets.Length; i++)
+      {
+        AddDefineSymbol(symbol, _buildTargets[i]);
+      }
+    }
+
+    /// <summary>
+    /// Add define symbol as soon as Unity gets done compiling.
+    /// </summary>
     public static void AddDefineSymbol(string symbol)
     {
+      AddDefineSymbol(symbol, EditorUserBuildSettings.selectedBuildTargetGroup);
+    }
+
+    /// <summary>
+    /// Add define symbol as soon as Unity gets done compiling.
+    /// </summary>
+    public static void AddDefineSymbol(string symbol, BuildTargetGroup buildTarget)
+    {
       string definesString =
-          PlayerSettings.GetScriptingDefineSymbolsForGroup(EditorUserBuildSettings.selectedBuildTargetGroup);
+        PlayerSettings.GetScriptingDefineSymbolsForGroup(buildTarget);
       List<string> allDefines = definesString.Split(';').ToList();
       if (allDefines.Contains(symbol))
       {
@@ -107,13 +216,14 @@ namespace BabilinApps.Defines.Utility.Editor
                                                        string.Join(";", allDefines.ToArray()));
     }
 
+
     /// <summary>
     /// Remove define symbol as soon as Unity gets done compiling.
     /// </summary>
-    public static void RemoveDefineSymbol(string symbol)
+    public static void RemoveDefineSymbol(string symbol, BuildTargetGroup buildTarget)
     {
       string definesString =
-          PlayerSettings.GetScriptingDefineSymbolsForGroup(EditorUserBuildSettings.selectedBuildTargetGroup);
+        PlayerSettings.GetScriptingDefineSymbolsForGroup(buildTarget);
       List<string> allDefines = definesString.Split(';').ToList();
       if (!allDefines.Contains(symbol))
       {
@@ -127,6 +237,28 @@ namespace BabilinApps.Defines.Utility.Editor
         PlayerSettings.SetScriptingDefineSymbolsForGroup(EditorUserBuildSettings.selectedBuildTargetGroup,
                                                          string.Join(";", allDefines.ToArray()));
       }
+
+    }
+
+
+    /// <summary>
+    /// Remove define symbol as soon as Unity gets done compiling.
+    /// </summary>
+    public static void RemoveDefineSymbolFromAllBuildTargetGroups(string symbol)
+    {
+      for (int i = 0; i < _buildTargets.Length; i++)
+      {
+        RemoveDefineSymbol(symbol, _buildTargets[i]);
+      }
+
+    }
+
+    /// <summary>
+    /// Remove define symbol as soon as Unity gets done compiling.
+    /// </summary>
+    public static void RemoveDefineSymbol(string symbol)
+    {
+      RemoveDefineSymbol(symbol, EditorUserBuildSettings.selectedBuildTargetGroup);
 
     }
 
@@ -160,6 +292,87 @@ namespace BabilinApps.Defines.Utility.Editor
     {
       return Directory.EnumerateDirectories(path, searchPattern).Any();
     }
+
+
+
+    /// <summary>
+    /// Checks if a Type exists in the project by name.
+    /// </summary>
+    /// <param name="contains"> full or partial name</param>
+    /// <param name="doesNotContain">filter</param>
+    /// <returns></returns>
+    public static bool TypeExists(string contains, string doesNotContain = null)
+    {
+      System.Reflection.Assembly[] assemblies = System.AppDomain.CurrentDomain.GetAssemblies();
+
+      foreach (var assembly in assemblies)
+      {
+        System.Type[] types = assembly.GetTypes();
+
+        foreach (var scriptType in types)
+        {
+          if (scriptType.FullName != null)
+          {
+            if (!string.IsNullOrEmpty(doesNotContain) && scriptType.FullName.Contains(doesNotContain))
+            {
+              continue;
+            }
+
+            if (scriptType.FullName.Contains(contains))
+            {
+              return true;
+
+
+            }
+
+            //if (scriptType.FullName != null && (scriptType.FullName.Contains(contains)))
+            //{
+            //    Debug.Log($"script name: {scriptType.FullName}");
+            //}
+          }
+
+        }
+      }
+
+      return false;
+
+
+
+
+    }
+
+    /// <summary>
+    /// Checks if an assembly exists in the project by name.
+    /// </summary>
+    /// <param name="contains"> full or partial name</param>
+    /// <param name="doesNotContain">filter</param>
+    /// <returns></returns>
+    public static bool AssemblyExists(string contains, string doesNotContain = null)
+    {
+      System.Reflection.Assembly[] assemblies = System.AppDomain.CurrentDomain.GetAssemblies();
+
+      foreach (var assembly in assemblies)
+      {
+        if (!string.IsNullOrEmpty(doesNotContain) && assembly.FullName.Contains(doesNotContain))
+        {
+          continue;
+        }
+
+        if (assembly.FullName.Contains(contains))
+        {
+          return true;
+
+
+        }
+      }
+
+      return false;
+
+
+
+
+    }
+
     public static bool ValidFolder(string path)
     {
       return AssetDatabase.IsValidFolder(path);
